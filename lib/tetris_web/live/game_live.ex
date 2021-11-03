@@ -3,7 +3,9 @@ defmodule TetrisWeb.GameLive do
   alias Tetris.Tetromino
 
   def mount(_params, _session, socket) do
-    :timer.send_interval(500, :tick)
+    if connected?(socket) do
+      :timer.send_interval(500, :tick)
+    end
 
     {
       :ok,
@@ -30,7 +32,7 @@ defmodule TetrisWeb.GameLive do
   defp render_board(assigns) do
     ~L"""
     <svg width="200" height="400">
-      <rect width="200" height="400" style="fill:rgb(0, 0, 0);" />
+      <rect width="200" height="400" style="fill:black;" />
       <%= render_points(assigns) %>
     </svg>
     """
@@ -38,15 +40,24 @@ defmodule TetrisWeb.GameLive do
 
   defp render_points(assigns) do
     ~L"""
-    <%= for {x, y} <- @points do %>
+    <%= for {x, y, shape} <- @points do %>
       <rect
         width="20" height="20"
-        style="fill:rgb(255, 128, 128);"
+        style="fill:<%= color(shape) %>;"
         x="<%= (x - 1) * 20 %>"
         y="<%= (y - 1) * 20 %>" />
     <% end %>
     """
   end
+
+  defp color(:l), do: "red"
+  defp color(:j), do: "saddlebrown"
+  defp color(:s), do: "gray"
+  defp color(:z), do: "aqua"
+  defp color(:o), do: "coral"
+  defp color(:i), do: "goldenrod"
+  defp color(:t), do: "limegreen"
+  defp color(_), do: "red"
 
   defp new_tetromino(socket) do
     assign(socket, tetro: Tetromino.new_random())
