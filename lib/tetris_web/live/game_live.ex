@@ -72,14 +72,18 @@ defmodule TetrisWeb.GameLive do
   def down(%{assigns: %{tetro: %{location: {_, 20}}}} = socket) do
     socket
     |> new_tetromino
-    |> show
   end
 
   def down(%{assigns: %{tetro: tetro}} = socket) do
     assign(socket, tetro: Tetromino.down(tetro))
   end
 
+  def rotate(%{assigns: %{tetro: tetro}} = socket) do
+    socket
+    |> assign(tetro: Tetromino.rotate(tetro))
+  end
+
   def handle_info(:tick, socket) do
-    {:noreply, socket |> down |> show}
+    {:noreply, socket |> down |> rotate |> show}
   end
 end
