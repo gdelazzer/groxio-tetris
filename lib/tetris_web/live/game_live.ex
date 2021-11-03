@@ -18,8 +18,10 @@ defmodule TetrisWeb.GameLive do
   def render(assigns) do
     ~L"""
     <section class="phx-hero">
-      <h1>Tetris</h1>
-      <%= render_board(assigns) %>
+      <div phx-window-keydown="keystroke">
+        <h1>Tetris</h1>
+        <%= render_board(assigns) %>
+      </div>
     </section>
     <% {x, y} = @tetro.location %>
     <pre>
@@ -83,7 +85,33 @@ defmodule TetrisWeb.GameLive do
     |> assign(tetro: Tetromino.rotate(tetro))
   end
 
+  def left(%{assigns: %{tetro: tetro}} = socket) do
+    socket
+    |> assign(tetro: Tetromino.left(tetro))
+  end
+
+  def right(%{assigns: %{tetro: tetro}} = socket) do
+    socket
+    |> assign(tetro: Tetromino.right(tetro))
+  end
+
   def handle_info(:tick, socket) do
-    {:noreply, socket |> down |> rotate |> show}
+    {:noreply, socket |> down |> show}
+  end
+
+  def handle_event("keystroke", %{"key" => " "}, socket) do
+    {:noreply, socket |> rotate |> down |> show}
+  end
+
+  def handle_event("keystroke", %{"key" => "ArrowLeft"}, socket) do
+    {:noreply, socket |> left |> down |> show}
+  end
+
+  def handle_event("keystroke", %{"key" => "ArrowRight"}, socket) do
+    {:noreply, socket |> right |> down |> show}
+  end
+
+  def handle_event("keystroke", %{"key" => "ArrowDown"}, socket) do
+    {:noreply, socket |> down |> down |> show}
   end
 end
