@@ -9,25 +9,56 @@ defmodule TetrisWeb.GameLive do
       :ok,
       socket
       |> new_tetromino
+      |> show
     }
-  end
-
-  def new_tetromino(socket) do
-    assign(socket, tetro: Tetromino.new_random())
   end
 
   def render(assigns) do
     ~L"""
     <section class="phx-hero">
       <h1>Tetris</h1>
+      <% [{x, y}] = @points %>
+      <%= render_board(assigns) %>
     </section>
-    <% {x, y} = @tetro.location %>
     <pre>
-      shape: <%= inspect @tetro.shape %>
-      rotation: <%= inspect @tetro.rotation %>
-      location: {<%= x %>, <%= y %>}
+      {<%= x %>, <%= y %>}
     </pre>
     """
+  end
+
+  defp render_board(assigns) do
+    ~L"""
+    <svg width="200" height="400">
+      <rect width="200" height="400" style="fill:rgb(0, 0, 0);" />
+      <%= render_points(assigns) %>
+    </svg>
+    """
+  end
+
+  defp render_points(%{points: [{x, y}]} = assigns) do
+    ~L"""
+    <rect
+      width="20" height="20"
+      style="fill:rgb(255, 128, 128);"
+      x="<%= (x - 1) * 20 %>"
+      y="<%= (y - 1) * 20 %>" />
+    """
+  end
+
+  defp new_tetromino(socket) do
+    assign(socket, tetro: Tetromino.new_random())
+  end
+
+  defp show(socket) do
+    assign(socket,
+      points: Tetromino.points(socket.assigns.tetro)
+    )
+  end
+
+  def down(%{assigns: %{tetro: %{location: {_, 20}}}} = socket) do
+    socket
+    |> new_tetromino
+    |> show
   end
 
   def down(%{assigns: %{tetro: tetro}} = socket) do
@@ -35,6 +66,6 @@ defmodule TetrisWeb.GameLive do
   end
 
   def handle_info(:tick, socket) do
-    {:noreply, down(socket)}
+    {:noreply, socket |> down |> show}
   end
 end
