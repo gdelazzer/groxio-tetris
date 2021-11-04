@@ -62,7 +62,8 @@ defmodule Tetris.Point do
   end
 
   def in_bounds?({x, y, _color}), do: in_bounds?({x, y})
-  def in_bounds?({x, y}) when x < 1, do: false
-  def in_bounds?({x, y}) when x > 10, do: false
-  def in_bounds?({x, y}), do: true
+  def in_bounds?({x, _y}) when x < 1, do: false
+  def in_bounds?({x, _y}) when x > 10, do: false
+  def in_bounds?({_x, y}) when y > 20, do: false
+  def in_bounds?({_x, _y}), do: true
 end

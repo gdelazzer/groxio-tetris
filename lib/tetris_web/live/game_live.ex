@@ -64,11 +64,6 @@ defmodule TetrisWeb.GameLive do
     assign(socket, game: Game.new_tetromino(socket.assigns.game))
   end
 
-  def down(%{assigns: %{game: %{tetro: %{location: {_, 20}}}}} = socket) do
-    socket
-    |> new_tetromino()
-  end
-
   def down(%{assigns: %{game: game}} = socket) do
     assign(socket, game: Game.down(game))
   end
