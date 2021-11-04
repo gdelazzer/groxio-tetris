@@ -21,7 +21,7 @@ defmodule TetrisWeb.GameLive do
     <% {x, y} = @game.tetro.location %>
     <pre>
       Location: <%= x %>, <%= y %>
-      <%= inspect @game.tetro %>
+      <%= inspect @game %>
     </pre>
     """
   end
@@ -37,7 +37,7 @@ defmodule TetrisWeb.GameLive do
 
   defp render_points(assigns) do
     ~L"""
-    <%= for {x, y, shape} <- @game.points do %>
+    <%= for {x, y, shape} <- @game.points ++ Game.junkyard(@game) do %>
       <rect
         width="20" height="20"
         style="fill:<%= color(shape) %>;"
