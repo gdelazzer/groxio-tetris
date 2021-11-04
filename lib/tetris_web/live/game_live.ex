@@ -1,18 +1,13 @@
 defmodule TetrisWeb.GameLive do
   use TetrisWeb, :live_view
-  alias Tetris.Tetromino
+  alias Tetris.Game
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
       :timer.send_interval(500, :tick)
     end
 
-    {
-      :ok,
-      socket
-      |> new_tetromino
-      |> show
-    }
+    {:ok, new_game(socket)}
   end
 
   def render(assigns) do
@@ -23,10 +18,10 @@ defmodule TetrisWeb.GameLive do
         <%= render_board(assigns) %>
       </div>
     </section>
-    <% {x, y} = @tetro.location %>
+    <% {x, y} = @game.tetro.location %>
     <pre>
       Location: <%= x %>, <%= y %>
-      <%= inspect @tetro %>
+      <%= inspect @game.tetro %>
     </pre>
     """
   end
@@ -42,7 +37,7 @@ defmodule TetrisWeb.GameLive do
 
   defp render_points(assigns) do
     ~L"""
-    <%= for {x, y, shape} <- @points do %>
+    <%= for {x, y, shape} <- @game.points do %>
       <rect
         width="20" height="20"
         style="fill:<%= color(shape) %>;"
@@ -61,57 +56,55 @@ defmodule TetrisWeb.GameLive do
   defp color(:t), do: "limegreen"
   defp color(_), do: "red"
 
+  defp new_game(socket) do
+    assign(socket, game: Game.new())
+  end
+
   defp new_tetromino(socket) do
-    assign(socket, tetro: Tetromino.new_random())
+    assign(socket, game: Game.new_tetromino(socket.assigns.game))
   end
 
-  defp show(socket) do
-    assign(socket,
-      points: Tetromino.show(socket.assigns.tetro)
-    )
-  end
-
-  def down(%{assigns: %{tetro: %{location: {_, 20}}}} = socket) do
+  def down(%{assigns: %{game: %{tetro: %{location: {_, 20}}}}} = socket) do
     socket
-    |> new_tetromino
+    |> new_tetromino()
   end
 
-  def down(%{assigns: %{tetro: tetro}} = socket) do
-    assign(socket, tetro: Tetromino.down(tetro))
+  def down(%{assigns: %{game: game}} = socket) do
+    assign(socket, game: Game.down(game))
   end
 
-  def rotate(%{assigns: %{tetro: tetro}} = socket) do
+  def rotate(%{assigns: %{game: game}} = socket) do
     socket
-    |> assign(tetro: Tetromino.rotate(tetro))
+    |> assign(game: Game.rotate(game))
   end
 
-  def left(%{assigns: %{tetro: tetro}} = socket) do
+  def left(%{assigns: %{game: game}} = socket) do
     socket
-    |> assign(tetro: Tetromino.left(tetro))
+    |> assign(game: Game.left(game))
   end
 
-  def right(%{assigns: %{tetro: tetro}} = socket) do
+  def right(%{assigns: %{game: game}} = socket) do
     socket
-    |> assign(tetro: Tetromino.right(tetro))
+    |> assign(game: Game.right(game))
   end
 
   def handle_info(:tick, socket) do
-    {:noreply, socket |> down |> show}
+    {:noreply, socket |> down}
   end
 
   def handle_event("keystroke", %{"key" => " "}, socket) do
-    {:noreply, socket |> rotate |> show}
+    {:noreply, socket |> rotate}
   end
 
   def handle_event("keystroke", %{"key" => "ArrowLeft"}, socket) do
-    {:noreply, socket |> left |> show}
+    {:noreply, socket |> left}
   end
 
   def handle_event("keystroke", %{"key" => "ArrowRight"}, socket) do
-    {:noreply, socket |> right |> show}
+    {:noreply, socket |> right}
   end
 
   def handle_event("keystroke", %{"key" => "ArrowDown"}, socket) do
-    {:noreply, socket |> down |> show}
+    {:noreply, socket |> down}
   end
 end
