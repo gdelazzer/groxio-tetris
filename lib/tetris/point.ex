@@ -60,4 +60,9 @@ defmodule Tetris.Point do
   def add_shape(point_with_shape, _shape) do
     point_with_shape
   end
+
+  def in_bounds?({x, y, _color}), do: in_bounds?({x, y})
+  def in_bounds?({x, y}) when x < 1, do: false
+  def in_bounds?({x, y}) when x > 10, do: false
+  def in_bounds?({x, y}), do: true
 end
