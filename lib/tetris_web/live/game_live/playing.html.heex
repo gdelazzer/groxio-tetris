@@ -1,0 +1,13 @@
+<section class="phx-hero">
+    <div phx-window-keydown="keystroke">
+        <h1>Tetris</h1>
+        <h2><%= @game.score %></h2>
+        <%= render_board(assigns) %>
+    </div>
+</section>
+<% {x, y} = @game.tetro.location %>
+<pre>
+    <%= inspect @live_action %>
+    Location: <%= x %>, <%= y %>
+    <%= inspect @game %>
+</pre>

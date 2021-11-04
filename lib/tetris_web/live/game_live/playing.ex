@@ -1,4 +1,4 @@
-defmodule TetrisWeb.GameLive do
+defmodule TetrisWeb.GameLive.Playing do
   use TetrisWeb, :live_view
   alias Tetris.Game
 
@@ -8,23 +8,6 @@ defmodule TetrisWeb.GameLive do
     end
 
     {:ok, new_game(socket)}
-  end
-
-  def render(assigns) do
-    ~L"""
-    <section class="phx-hero">
-      <div phx-window-keydown="keystroke">
-        <h1>Tetris</h1>
-        <h2><%= @game.score %></h2>
-        <%= render_board(assigns) %>
-      </div>
-    </section>
-    <% {x, y} = @game.tetro.location %>
-    <pre>
-      Location: <%= x %>, <%= y %>
-      <%= inspect @game %>
-    </pre>
-    """
   end
 
   defp render_board(assigns) do
@@ -59,10 +42,6 @@ defmodule TetrisWeb.GameLive do
 
   defp new_game(socket) do
     assign(socket, game: Game.new())
-  end
-
-  defp new_tetromino(socket) do
-    assign(socket, game: Game.new_tetromino(socket.assigns.game))
   end
 
   def down(%{assigns: %{game: game}} = socket) do
