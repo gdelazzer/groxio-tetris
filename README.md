@@ -1,5 +1,7 @@
 # Tetris
 
+__Tetris game from the grox.io tutorial.__
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
